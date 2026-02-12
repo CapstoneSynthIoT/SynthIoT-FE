@@ -5,9 +5,9 @@ import Footer from "@/components/Footer";
 
 const Index = () => {
   return (
-    <div className="h-screen overflow-hidden bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
       <Header />
-      <div className="flex-1 overflow-hidden flex flex-col">
+      <div className="flex-1 overflow-y-auto flex flex-col">
         <Hero />
         <Features />
         <Footer />

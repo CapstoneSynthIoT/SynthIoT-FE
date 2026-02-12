@@ -15,6 +15,14 @@ const SignUp = () => {
     const [confirmPassword, setConfirmPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+
+    // Password validation rules
+    const passwordValidation = {
+        hasMinLength: password.length >= 8,
+        hasUpperCase: /[A-Z]/.test(password),
+        hasNumber: /[0-9]/.test(password),
+    };
 
     const handleSendCode = (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,6 +38,27 @@ const SignUp = () => {
 
     const handleCreateAccount = (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Validate password requirements
+        if (!passwordValidation.hasMinLength || !passwordValidation.hasUpperCase || !passwordValidation.hasNumber) {
+            toast({
+                title: "Invalid Password",
+                description: "Password must contain at least 8 characters, one capital letter, and one number.",
+                variant: "destructive",
+            });
+            return;
+        }
+
+        // Validate password match
+        if (password !== confirmPassword) {
+            toast({
+                title: "Passwords Don't Match",
+                description: "Please ensure both passwords are the same.",
+                variant: "destructive",
+            });
+            return;
+        }
+
         // TODO: Create account
         console.log("Account created", { email, phone, password });
 
@@ -183,6 +212,8 @@ const SignUp = () => {
                                             id="password"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
+                                            onFocus={() => setIsPasswordFocused(true)}
+                                            onBlur={() => setIsPasswordFocused(false)}
                                             className="w-full rounded-lg border border-input bg-background px-4 py-3 pr-12 text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                             placeholder="••••••••"
                                             required
@@ -204,6 +235,57 @@ const SignUp = () => {
                                             )}
                                         </button>
                                     </div>
+
+                                    {/* Password validation rules */}
+                                    {isPasswordFocused && (
+                                        <div className="mt-3 rounded-lg border border-border/60 bg-card/50 p-3 space-y-2 max-h-40 overflow-y-auto">
+                                            <p className="text-xs font-medium text-muted-foreground mb-2">Password must contain:</p>
+                                            <div className="space-y-1.5">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`h-4 w-4 rounded-full flex items-center justify-center transition-colors ${passwordValidation.hasMinLength ? 'bg-green-500' : 'bg-muted'
+                                                        }`}>
+                                                        {passwordValidation.hasMinLength && (
+                                                            <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                        )}
+                                                    </div>
+                                                    <span className={`text-xs transition-colors ${passwordValidation.hasMinLength ? 'text-green-500 font-medium' : 'text-muted-foreground'
+                                                        }`}>
+                                                        At least 8 characters
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`h-4 w-4 rounded-full flex items-center justify-center transition-colors ${passwordValidation.hasUpperCase ? 'bg-green-500' : 'bg-muted'
+                                                        }`}>
+                                                        {passwordValidation.hasUpperCase && (
+                                                            <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                        )}
+                                                    </div>
+                                                    <span className={`text-xs transition-colors ${passwordValidation.hasUpperCase ? 'text-green-500 font-medium' : 'text-muted-foreground'
+                                                        }`}>
+                                                        One capital letter
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`h-4 w-4 rounded-full flex items-center justify-center transition-colors ${passwordValidation.hasNumber ? 'bg-green-500' : 'bg-muted'
+                                                        }`}>
+                                                        {passwordValidation.hasNumber && (
+                                                            <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                                            </svg>
+                                                        )}
+                                                    </div>
+                                                    <span className={`text-xs transition-colors ${passwordValidation.hasNumber ? 'text-green-500 font-medium' : 'text-muted-foreground'
+                                                        }`}>
+                                                        One number
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
 
                                 <div>
