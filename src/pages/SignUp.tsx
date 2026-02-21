@@ -134,7 +134,7 @@ const SignUp = () => {
         }
 
         // TODO: Create account
-        console.log("Account created", { email, phone: `${countryCode} ${phone}`, password });
+        console.log("Account created", { name, email, phone: `${countryCode} ${phone}`, password });
 
         // Show success toast
         toast({
