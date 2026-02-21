@@ -8,6 +8,7 @@ const SignUp = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
     const [step, setStep] = useState(1);
+    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [countryCode, setCountryCode] = useState("+1");
     const [phone, setPhone] = useState("");
@@ -186,6 +187,21 @@ const SignUp = () => {
                         {/* Step 1: Email & Phone */}
                         {step === 1 && (
                             <form onSubmit={handleSendCode} className="space-y-6">
+                                <div>
+                                    <label htmlFor="name" className="mb-2 block text-sm font-medium text-foreground">
+                                        Name
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="name"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        className="w-full rounded-lg border border-input bg-background px-4 py-3 text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                                        placeholder="John Doe"
+                                        required
+                                    />
+                                </div>
+
                                 <div>
                                     <label htmlFor="email" className="mb-2 block text-sm font-medium text-foreground">
                                         Email
