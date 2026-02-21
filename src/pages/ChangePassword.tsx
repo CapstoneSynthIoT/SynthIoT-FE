@@ -4,30 +4,24 @@ import Header from "@/components/Header";
 import logo from "@/assets/logo.png";
 import { useToast } from "@/hooks/use-toast";
 
-const SignUp = () => {
+const ChangePassword = () => {
     const navigate = useNavigate();
     const { toast } = useToast();
     const [step, setStep] = useState(1);
-    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
-    const [phone, setPhone] = useState("");
     const [verificationCode, setVerificationCode] = useState("");
-    const [password, setPassword] = useState("");
+    const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
-    const [showPassword, setShowPassword] = useState(false);
+    const [showNewPassword, setShowNewPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [isPasswordFocused, setIsPasswordFocused] = useState(false);
-
-    // Password validation rules
-    const passwordValidation = {
-        hasMinLength: password.length >= 8,
-        hasUpperCase: /[A-Z]/.test(password),
-        hasNumber: /[0-9]/.test(password),
-    };
 
     const handleSendCode = (e: React.FormEvent) => {
         e.preventDefault();
         // TODO: Send verification code to email
+        toast({
+            title: "Verification code sent!",
+            description: "Please check your email for the verification code.",
+        });
         setStep(2);
     };
 
@@ -37,36 +31,26 @@ const SignUp = () => {
         setStep(3);
     };
 
-    const handleCreateAccount = (e: React.FormEvent) => {
+    const handleChangePassword = (e: React.FormEvent) => {
         e.preventDefault();
 
-        // Validate password requirements
-        if (!passwordValidation.hasMinLength || !passwordValidation.hasUpperCase || !passwordValidation.hasNumber) {
+        // Validate passwords match
+        if (newPassword !== confirmPassword) {
             toast({
-                title: "Invalid Password",
-                description: "Password must contain at least 8 characters, one capital letter, and one number.",
+                title: "Passwords don't match",
+                description: "Please make sure both passwords are the same.",
                 variant: "destructive",
             });
             return;
         }
 
-        // Validate password match
-        if (password !== confirmPassword) {
-            toast({
-                title: "Passwords Don't Match",
-                description: "Please ensure both passwords are the same.",
-                variant: "destructive",
-            });
-            return;
-        }
-
-        // TODO: Create account
-        console.log("Account created", { name, email, phone, password });
+        // TODO: Change password API call
+        console.log("Password changed", { email, newPassword });
 
         // Show success toast
         toast({
-            title: "Account created successfully!",
-            description: "Please sign in to continue using SynthIoT.",
+            title: "Password changed successfully!",
+            description: "You can now sign in with your new password.",
         });
 
         // Navigate to sign-in page
@@ -91,7 +75,7 @@ const SignUp = () => {
                         <img src={logo} alt="SynthIoT S Logo" className="h-28 w-28" />
                     </div>
 
-                    {/* Sign up card */}
+                    {/* Change password card */}
                     <div className="card-shine rounded-2xl border border-border/60 bg-card p-8 shadow-2xl">
                         {/* Progress indicator */}
                         <div className="mb-6 flex justify-center gap-2">
@@ -101,34 +85,19 @@ const SignUp = () => {
                         </div>
 
                         <h1 className="mb-2 text-center text-3xl font-bold text-foreground">
-                            {step === 1 && "Create Account"}
+                            {step === 1 && "Reset Password"}
                             {step === 2 && "Verify Email"}
-                            {step === 3 && "Set Password"}
+                            {step === 3 && "New Password"}
                         </h1>
                         <p className="mb-8 text-center text-sm text-muted-foreground">
-                            {step === 1 && "Enter your details to get started"}
+                            {step === 1 && "Enter your email to receive a verification code"}
                             {step === 2 && "Enter the code sent to your email"}
-                            {step === 3 && "Create a secure password"}
+                            {step === 3 && "Create a new secure password"}
                         </p>
 
-                        {/* Step 1: Email & Phone */}
+                        {/* Step 1: Email */}
                         {step === 1 && (
                             <form onSubmit={handleSendCode} className="space-y-6">
-                                <div>
-                                    <label htmlFor="name" className="mb-2 block text-sm font-medium text-foreground">
-                                        Name
-                                    </label>
-                                    <input
-                                        type="text"
-                                        id="name"
-                                        value={name}
-                                        onChange={(e) => setName(e.target.value)}
-                                        className="w-full rounded-lg border border-input bg-background px-4 py-3 text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                        placeholder="John Doe"
-                                        required
-                                    />
-                                </div>
-
                                 <div>
                                     <label htmlFor="email" className="mb-2 block text-sm font-medium text-foreground">
                                         Email
@@ -140,21 +109,6 @@ const SignUp = () => {
                                         onChange={(e) => setEmail(e.target.value)}
                                         className="w-full rounded-lg border border-input bg-background px-4 py-3 text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                         placeholder="you@example.com"
-                                        required
-                                    />
-                                </div>
-
-                                <div>
-                                    <label htmlFor="phone" className="mb-2 block text-sm font-medium text-foreground">
-                                        Phone Number
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        id="phone"
-                                        value={phone}
-                                        onChange={(e) => setPhone(e.target.value)}
-                                        className="w-full rounded-lg border border-input bg-background px-4 py-3 text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                        placeholder="+1 (555) 000-0000"
                                         required
                                     />
                                 </div>
@@ -215,31 +169,29 @@ const SignUp = () => {
                             </form>
                         )}
 
-                        {/* Step 3: Password */}
+                        {/* Step 3: New Password */}
                         {step === 3 && (
-                            <form onSubmit={handleCreateAccount} className="space-y-6">
+                            <form onSubmit={handleChangePassword} className="space-y-6">
                                 <div>
-                                    <label htmlFor="password" className="mb-2 block text-sm font-medium text-foreground">
-                                        Password
+                                    <label htmlFor="newPassword" className="mb-2 block text-sm font-medium text-foreground">
+                                        New Password
                                     </label>
                                     <div className="relative">
                                         <input
-                                            type={showPassword ? "text" : "password"}
-                                            id="password"
-                                            value={password}
-                                            onChange={(e) => setPassword(e.target.value)}
-                                            onFocus={() => setIsPasswordFocused(true)}
-                                            onBlur={() => setIsPasswordFocused(false)}
+                                            type={showNewPassword ? "text" : "password"}
+                                            id="newPassword"
+                                            value={newPassword}
+                                            onChange={(e) => setNewPassword(e.target.value)}
                                             className="w-full rounded-lg border border-input bg-background px-4 py-3 pr-12 text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                                             placeholder="••••••••"
                                             required
                                         />
                                         <button
                                             type="button"
-                                            onClick={() => setShowPassword(!showPassword)}
+                                            onClick={() => setShowNewPassword(!showNewPassword)}
                                             className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-colors hover:text-foreground"
                                         >
-                                            {showPassword ? (
+                                            {showNewPassword ? (
                                                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                                                 </svg>
@@ -251,62 +203,11 @@ const SignUp = () => {
                                             )}
                                         </button>
                                     </div>
-
-                                    {/* Password validation rules */}
-                                    {isPasswordFocused && (
-                                        <div className="mt-3 rounded-lg border border-border/60 bg-card/50 p-3 space-y-2 max-h-40 overflow-y-auto">
-                                            <p className="text-xs font-medium text-muted-foreground mb-2">Password must contain:</p>
-                                            <div className="space-y-1.5">
-                                                <div className="flex items-center gap-2">
-                                                    <div className={`h-4 w-4 rounded-full flex items-center justify-center transition-colors ${passwordValidation.hasMinLength ? 'bg-green-500' : 'bg-muted'
-                                                        }`}>
-                                                        {passwordValidation.hasMinLength && (
-                                                            <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                                            </svg>
-                                                        )}
-                                                    </div>
-                                                    <span className={`text-xs transition-colors ${passwordValidation.hasMinLength ? 'text-green-500 font-medium' : 'text-muted-foreground'
-                                                        }`}>
-                                                        At least 8 characters
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <div className={`h-4 w-4 rounded-full flex items-center justify-center transition-colors ${passwordValidation.hasUpperCase ? 'bg-green-500' : 'bg-muted'
-                                                        }`}>
-                                                        {passwordValidation.hasUpperCase && (
-                                                            <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                                            </svg>
-                                                        )}
-                                                    </div>
-                                                    <span className={`text-xs transition-colors ${passwordValidation.hasUpperCase ? 'text-green-500 font-medium' : 'text-muted-foreground'
-                                                        }`}>
-                                                        One capital letter
-                                                    </span>
-                                                </div>
-                                                <div className="flex items-center gap-2">
-                                                    <div className={`h-4 w-4 rounded-full flex items-center justify-center transition-colors ${passwordValidation.hasNumber ? 'bg-green-500' : 'bg-muted'
-                                                        }`}>
-                                                        {passwordValidation.hasNumber && (
-                                                            <svg className="h-3 w-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
-                                                            </svg>
-                                                        )}
-                                                    </div>
-                                                    <span className={`text-xs transition-colors ${passwordValidation.hasNumber ? 'text-green-500 font-medium' : 'text-muted-foreground'
-                                                        }`}>
-                                                        One number
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
 
                                 <div>
                                     <label htmlFor="confirmPassword" className="mb-2 block text-sm font-medium text-foreground">
-                                        Confirm Password
+                                        Confirm New Password
                                     </label>
                                     <div className="relative">
                                         <input
@@ -349,7 +250,7 @@ const SignUp = () => {
                                         type="submit"
                                         className="flex-1 rounded-xl bg-primary px-8 py-3.5 text-base font-semibold text-primary-foreground transition-all hover:brightness-110 glow-primary"
                                     >
-                                        Create Account
+                                        Change Password
                                     </button>
                                 </div>
                             </form>
@@ -357,7 +258,7 @@ const SignUp = () => {
 
                         {/* Sign in link */}
                         <p className="mt-6 text-center text-sm text-muted-foreground">
-                            Already have an account?{" "}
+                            Remember your password?{" "}
                             <Link to="/signin" className="font-medium text-primary transition-colors hover:text-primary/80">
                                 Sign in
                             </Link>
@@ -369,4 +270,4 @@ const SignUp = () => {
     );
 };
 
-export default SignUp;
+export default ChangePassword;
