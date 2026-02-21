@@ -9,6 +9,7 @@ const SignUp = () => {
     const { toast } = useToast();
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState("");
+    const [countryCode, setCountryCode] = useState("+1");
     const [phone, setPhone] = useState("");
     const [verificationCode, setVerificationCode] = useState("");
     const [password, setPassword] = useState("");
@@ -16,6 +17,71 @@ const SignUp = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+    const [phoneError, setPhoneError] = useState("");
+
+    // Country codes list
+    const countryCodes = [
+        { code: "+1", country: "US/CA" },
+        { code: "+44", country: "UK" },
+        { code: "+91", country: "IN" },
+        { code: "+86", country: "CN" },
+        { code: "+81", country: "JP" },
+        { code: "+49", country: "DE" },
+        { code: "+33", country: "FR" },
+        { code: "+39", country: "IT" },
+        { code: "+34", country: "ES" },
+        { code: "+61", country: "AU" },
+        { code: "+7", country: "RU" },
+        { code: "+82", country: "KR" },
+        { code: "+55", country: "BR" },
+        { code: "+52", country: "MX" },
+        { code: "+27", country: "ZA" },
+        { code: "+20", country: "EG" },
+        { code: "+234", country: "NG" },
+        { code: "+971", country: "AE" },
+        { code: "+65", country: "SG" },
+        { code: "+60", country: "MY" },
+    ];
+
+    // Expected digit counts per country code
+    const phoneDigitRules: Record<string, { digits: number; label: string }> = {
+        "+1": { digits: 10, label: "US/CA" },
+        "+44": { digits: 10, label: "UK" },
+        "+91": { digits: 10, label: "India" },
+        "+86": { digits: 11, label: "China" },
+        "+81": { digits: 10, label: "Japan" },
+        "+49": { digits: 10, label: "Germany" },
+        "+33": { digits: 9, label: "France" },
+        "+39": { digits: 10, label: "Italy" },
+        "+34": { digits: 9, label: "Spain" },
+        "+61": { digits: 9, label: "Australia" },
+        "+7": { digits: 10, label: "Russia" },
+        "+82": { digits: 10, label: "South Korea" },
+        "+55": { digits: 11, label: "Brazil" },
+        "+52": { digits: 10, label: "Mexico" },
+        "+27": { digits: 9, label: "South Africa" },
+        "+20": { digits: 10, label: "Egypt" },
+        "+234": { digits: 10, label: "Nigeria" },
+        "+971": { digits: 9, label: "UAE" },
+        "+65": { digits: 8, label: "Singapore" },
+        "+60": { digits: 9, label: "Malaysia" },
+    };
+
+    const validatePhone = (value: string, code: string) => {
+        const digits = value.replace(/\D/g, "");
+        const rule = phoneDigitRules[code];
+        if (!rule) {
+            setPhoneError("");
+            return;
+        }
+        if (digits.length === 0) {
+            setPhoneError("");
+        } else if (digits.length !== rule.digits) {
+            setPhoneError(`${rule.label} phone numbers must be exactly ${rule.digits} digits.`);
+        } else {
+            setPhoneError("");
+        }
+    };
 
     // Password validation rules
     const passwordValidation = {
@@ -26,6 +92,13 @@ const SignUp = () => {
 
     const handleSendCode = (e: React.FormEvent) => {
         e.preventDefault();
+        // Validate phone length before proceeding
+        const digits = phone.replace(/\D/g, "");
+        const rule = phoneDigitRules[countryCode];
+        if (rule && digits.length !== rule.digits) {
+            setPhoneError(`${rule.label} phone numbers must be exactly ${rule.digits} digits.`);
+            return;
+        }
         // TODO: Send verification code to email
         setStep(2);
     };
@@ -60,7 +133,7 @@ const SignUp = () => {
         }
 
         // TODO: Create account
-        console.log("Account created", { email, phone, password });
+        console.log("Account created", { email, phone: `${countryCode} ${phone}`, password });
 
         // Show success toast
         toast({
@@ -132,15 +205,45 @@ const SignUp = () => {
                                     <label htmlFor="phone" className="mb-2 block text-sm font-medium text-foreground">
                                         Phone Number
                                     </label>
-                                    <input
-                                        type="tel"
-                                        id="phone"
-                                        value={phone}
-                                        onChange={(e) => setPhone(e.target.value)}
-                                        className="w-full rounded-lg border border-input bg-background px-4 py-3 text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                                        placeholder="+1 (555) 000-0000"
-                                        required
-                                    />
+                                    <div className="flex gap-2">
+                                        <select
+                                            value={countryCode}
+                                            onChange={(e) => {
+                                                setCountryCode(e.target.value);
+                                                validatePhone(phone, e.target.value);
+                                            }}
+                                            className="rounded-lg border border-input bg-background px-3 py-3 text-foreground transition-colors focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 w-28"
+                                        >
+                                            {countryCodes.map((item) => (
+                                                <option key={item.code} value={item.code}>
+                                                    {item.code} {item.country}
+                                                </option>
+                                            ))}
+                                        </select>
+                                        <input
+                                            type="tel"
+                                            id="phone"
+                                            value={phone}
+                                            onChange={(e) => {
+                                                setPhone(e.target.value);
+                                                validatePhone(e.target.value, countryCode);
+                                            }}
+                                            className={`flex-1 rounded-lg border px-4 py-3 text-foreground transition-colors focus:outline-none focus:ring-2 bg-background ${phoneError
+                                                ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                                : "border-input focus:border-primary focus:ring-primary/20"
+                                                }`}
+                                            placeholder="(555) 000-0000"
+                                            required
+                                        />
+                                    </div>
+                                    {phoneError && (
+                                        <p className="mt-1.5 flex items-center gap-1.5 text-xs text-red-500">
+                                            <svg className="h-3.5 w-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+                                            </svg>
+                                            {phoneError}
+                                        </p>
+                                    )}
                                 </div>
 
                                 <button
