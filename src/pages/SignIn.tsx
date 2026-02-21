@@ -1,11 +1,18 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Header from "@/components/Header";
 import logo from "@/assets/logo.png";
 import logoText from "@/assets/Screenshot_2026-02-11_150622-removebg-preview.png";
 
 const SignIn = () => {
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
+
+    const handleSignIn = (e: React.FormEvent) => {
+        e.preventDefault();
+        // TODO: authenticate with backend
+        navigate("/home");
+    };
 
     return (
         <div className="min-h-screen bg-background">
@@ -35,7 +42,7 @@ const SignIn = () => {
                             Sign in to your account to continue
                         </p>
 
-                        <form className="space-y-6">
+                        <form className="space-y-6" onSubmit={handleSignIn}>
                             {/* Email field */}
                             <div>
                                 <label htmlFor="email" className="mb-2 block text-sm font-medium text-foreground">
@@ -82,7 +89,7 @@ const SignIn = () => {
 
                             {/* Forgot password link */}
                             <div className="flex justify-end">
-                                <Link to="/forgot-password" className="text-sm font-medium text-primary transition-colors hover:text-primary/80">
+                                <Link to="/change-password" className="text-sm font-medium text-primary transition-colors hover:text-primary/80">
                                     Forgot password?
                                 </Link>
                             </div>
